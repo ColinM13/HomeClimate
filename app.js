@@ -3,6 +3,7 @@ const express = require('express')
 const http = require('http')
 const os = require('os')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
 const app = express()
 const jsonParser = bodyParser.json()
@@ -11,6 +12,10 @@ const hostname = 'localhost';
 const port = 3000;
 const databaseName = 'home_climate';
 
+const corsOptions = {
+    origin: 'http://192.168.1.67'
+}
+
 const influx = new Influx.InfluxDB({
     host: hostname,
     database: databaseName,
@@ -18,9 +23,9 @@ const influx = new Influx.InfluxDB({
         {
             measurement: 'climate',
             fields: {
-                temp: Influx.FieldType.INTEGER,
-                humidity: Influx.FieldType.INTEGER,
-                pressure: Influx.FieldType.INTEGER
+                temp: Influx.FieldType.FLOAT,
+                humidity: Influx.FieldType.FLOAT,
+                pressure: Influx.FieldType.FLOAT
             },
             tags: [
                 'location'
@@ -49,7 +54,7 @@ app.get('/', function (req, res) {
     res.send('Hello World');
 })
 
-app.get('/readings', function(req, res) {
+app.get('/readings', cors(corsOptions), function(req, res) {
     influx.query(`
     select * from climate
     order by time desc
@@ -61,7 +66,8 @@ app.get('/readings', function(req, res) {
     })
 })
 
-app.post('/readings', jsonParser, function(req, res) {
+app.post('/readings', jsonParser, cors(corsOptions), function(req, res) {
+    console.log("incoming data reading")
     const dataReadings = { temp, humidity, pressure } = req.body;
     const location = req.body.location;
     influx.writePoints([
