@@ -12,9 +12,9 @@ const hostname = 'localhost';
 const port = 3000;
 const databaseName = 'home_climate';
 
-const corsOptions = {
-    origin: 'http://192.168.1.67'
-}
+//const corsOptions = {
+//    origin: 'http://192.168.1.67'
+//}
 
 const influx = new Influx.InfluxDB({
     host: hostname,
@@ -54,7 +54,7 @@ app.get('/', function (req, res) {
     res.send('Hello World');
 })
 
-app.get('/readings', cors(corsOptions), function(req, res) {
+app.get('/readings', function(req, res) {
     influx.query(`
     select * from climate
     order by time desc
@@ -66,7 +66,7 @@ app.get('/readings', cors(corsOptions), function(req, res) {
     })
 })
 
-app.post('/readings', jsonParser, cors(corsOptions), function(req, res) {
+app.post('/readings', jsonParser, function(req, res) {
     console.log("incoming data reading")
     const dataReadings = { temp, humidity, pressure } = req.body;
     const location = req.body.location;
