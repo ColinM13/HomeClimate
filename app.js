@@ -54,11 +54,7 @@ app.get('/', function (req, res) {
     res.send('Hello World');
 })
 
-<<<<<<< HEAD
 app.get('/readings', cors(), function(req, res) {
-=======
-app.get('/readings', function(req, res) {
->>>>>>> bb8544a346ad30ecb885c9d205657cc44879eb63
     influx.query(`
     select * from climate
     order by time desc
